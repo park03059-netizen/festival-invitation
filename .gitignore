@@ -1,0 +1,6 @@
+# 인터넷에 올리지 않을 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+비공개/
