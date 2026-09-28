@@ -51,7 +51,17 @@ window.FESTIVAL = {
 
      timetable 한 칸 모양:
        { start: "18:00", end: "18:40", type: "종류", title: "제목", desc: "설명",
-         artist: { name: "", photo: "", desc: "" }, revealAt: "" }
+         headliner: true,   ← 헤드라이너면 넣기 (포스터에 HEADLINER 표시)
+         artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" }, revealAt: "" }
+
+     🎤 아티스트 칸 채우는 법 (시간표 맨 위 "LINE-UP" 포스터와 소개 영상이 자동으로 만들어져요)
+       name   : 아티스트 이름 (예: "해양밴드")
+       nameEn : 영어 이름 (포스터에 크게 들어가요, 비워도 됨)
+       photo  : 포스터 대표 사진 — 세로 사진 추천 (예: "images/artists/haeyang.jpg")
+       photos : 소개 영상에서 빠르게 넘어갈 사진들 (예: ["images/artists/h1.jpg", "images/artists/h2.jpg"])
+       video  : 진짜 소개 영상 파일이 있으면 (예: "images/artists/haeyang.mp4") → 이 영상이 대신 재생돼요
+       ※ 사진·영상은 소속사/본인 허락을 받은 것만! CREDITS.md 에 출처를 적어 주세요.
+       ※ 미리 보기: 주소 끝에 ?demo=lineup 을 붙이면 샘플 아티스트로 채워서 보여 줘요.
      type(종류): "artist" 아티스트 / "club" 동아리 공연 / "booth" 부스
                  "fireworks" 불꽃놀이 / "event" 행사
      아티스트 이름(name)을 비워 두면 실루엣과 "추후 공개"로 보여요.
@@ -74,8 +84,8 @@ window.FESTIVAL = {
         { start: "11:00", end: "11:30", type: "event", title: "개막식", desc: "(임시)" },
         { start: "14:00", end: "14:40", type: "club", title: "동아리 공연 ①", desc: "밴드 동아리 (임시)" },
         { start: "15:00", end: "15:40", type: "club", title: "동아리 공연 ②", desc: "댄스 동아리 (임시)" },
-        { start: "18:30", end: "19:10", type: "artist", title: "아티스트 공연", artist: { name: "", photo: "", desc: "" } },
-        { start: "19:30", end: "20:20", type: "artist", title: "아티스트 공연", artist: { name: "", photo: "", desc: "" } }
+        { start: "18:30", end: "19:10", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
+        { start: "19:30", end: "20:20", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } }
       ]
     },
     {
@@ -91,9 +101,9 @@ window.FESTIVAL = {
       timetable: [
         { start: "10:00", end: "17:00", type: "booth", title: "학과·동아리 부스 운영", desc: "먹거리·체험 부스 (임시)" },
         { start: "14:00", end: "14:40", type: "club", title: "동아리 공연 ③", desc: "보컬 동아리 (임시)" },
-        { start: "18:30", end: "19:10", type: "artist", title: "아티스트 공연", artist: { name: "", photo: "", desc: "" } },
-        { start: "19:30", end: "20:20", type: "artist", title: "아티스트 공연", artist: { name: "", photo: "", desc: "" } },
-        { start: "20:40", end: "21:30", type: "artist", title: "헤드라이너 공연", artist: { name: "", photo: "", desc: "" } },
+        { start: "18:30", end: "19:10", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
+        { start: "19:30", end: "20:20", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
+        { start: "20:40", end: "21:30", type: "artist", title: "헤드라이너 공연", headliner: true, artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
         { start: "21:30", end: "21:45", type: "fireworks", title: "폐막 불꽃놀이", desc: "(임시)" }
       ]
     }

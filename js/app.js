@@ -7,6 +7,32 @@
   var KST = 9 * 3600 * 1000;
   var params = new URLSearchParams(location.search);
 
+  // 미리 보기: ?demo=lineup 을 붙이면 비어 있는 아티스트 칸을 샘플로 채워요 (실제 정보는 바뀌지 않음)
+  if (params.get('demo') === 'lineup') {
+    var DEMO = [['샘플 밴드', 'SAMPLE BAND'], ['바다소리', 'BADA SORI'], ['오션 크루', 'OCEAN CREW'], ['파도', 'PADO'], ['해양 오케스트라', 'KMOU ORCHESTRA']];
+    var k = 0;
+    C.days.forEach(function (d) { d.timetable.forEach(function (it) {
+      if (it.type !== 'artist' || (it.artist && it.artist.name)) return;
+      var n = DEMO[k % DEMO.length], p = 'images/sample/stage' + (k % 4 + 1) + '.jpg';
+      it.artist = { name: n[0], nameEn: n[1], photo: p, desc: '샘플 아티스트 (미리 보기용)',
+        photos: [1, 2, 3, 4].map(function (x) { return 'images/sample/stage' + ((k + x) % 4 + 1) + '.jpg'; }) };
+      it.revealAt = '2000-01-01T00:00:00+09:00'; k++;
+    }); });
+  }
+
+  // 미리 보기: ?demo=lineup 을 붙이면 비어 있는 아티스트 칸을 샘플로 채워요 (실제 정보는 바뀌지 않음)
+  if (params.get('demo') === 'lineup') {
+    var DEMO = [['샘플 밴드', 'SAMPLE BAND'], ['바다소리', 'BADA SORI'], ['오션 크루', 'OCEAN CREW'], ['파도', 'PADO'], ['해양 오케스트라', 'KMOU ORCHESTRA']];
+    var k = 0;
+    C.days.forEach(function (d) { d.timetable.forEach(function (it) {
+      if (it.type !== 'artist' || (it.artist && it.artist.name)) return;
+      var n = DEMO[k % DEMO.length], p = 'images/sample/stage' + (k % 4 + 1) + '.jpg';
+      it.artist = { name: n[0], nameEn: n[1], photo: p, desc: '샘플 아티스트 (미리 보기용)',
+        photos: [1, 2, 3, 4].map(function (x) { return 'images/sample/stage' + ((k + x) % 4 + 1) + '.jpg'; }) };
+      it.revealAt = '2000-01-01T00:00:00+09:00'; k++;
+    }); });
+  }
+
   /* ---------- 작은 도우미 ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -316,6 +342,7 @@
       artistsState.day = (today || C.days[0]).id;
     }
     renderSlots();
+    document.dispatchEvent(new Event('artistsbuilt'));
   }
   function renderSlots() {
     var day = C.days.filter(function (d) { return d.id === artistsState.day; })[0];
@@ -498,7 +525,7 @@
   /* ================= 시작 ================= */
   window.App = { C: C, S: S, $: $, $$: $$, el: el, withTemp: withTemp, tempBadge: tempBadge, now: now, fmtKst: fmtKst,
     toast: toast, copyText: copyText, store: store, api: api, settingsReady: settingsReady, invitee: invitee,
-    cleanName: cleanName, loadScript: loadScript, REDUCED: REDUCED };
+    cleanName: cleanName, loadScript: loadScript, REDUCED: REDUCED, isRevealed: isRevealed, revealAt: revealAt };
 
   buildSchedule(); renderNotice(); tick();
   setInterval(tick, 1000);
