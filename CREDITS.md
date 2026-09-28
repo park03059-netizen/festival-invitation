@@ -12,7 +12,9 @@
 | html2canvas 1.4.1 | 초청장 카드 사진 저장 기능 | cdnjs.cloudflare.com | MIT 라이선스 (무료) |
 | 카카오 JavaScript SDK 2.7.2 | 카카오톡 보내기 | Kakao Developers | 카카오 개발자 약관 (무료) |
 | Black Han Sans (검은고딕) | 포스터·영상 큰 글씨 | Google Fonts (Zess Type) | SIL Open Font License (무료, 상업 사용 가능) |
-| images/sample/stage1~4.jpg | 미리 보기용 샘플 무대 사진 (?demo=lineup 에서만 사용) | 이 프로젝트에서 직접 그림 | 자유 사용 |
+| images/sample/stage1~4.jpg | 미리 보기용 샘플 무대 그림 (?demo=lineup) | tools/make_stage_images.py 로 직접 그림 | 자유 사용 |
+| images/stage-epic.jpg | COMING SOON 포스터·티저 배경 무대 그림 | tools/make_stage_images.py 로 직접 그림 | 자유 사용 |
+| 소개 영상 배경음악 (록) | 드럼·기타·베이스를 코드로 합성 (js/rockmusic.js) | 이 프로젝트에서 직접 만듦 | 자유 사용 (녹음 음원 없음) |
 | 글꼴 | 폰 기본 글꼴 (애플 SD 산돌고딕, 맑은 고딕 등) | 각 기기 | 내려받지 않음 |
 
 ## 사진 (추가 예정)

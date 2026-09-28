@@ -43,6 +43,7 @@ window.FESTIVAL = {
   apiUrl: "",        // (임시) 구글 시트 연결 주소 — 설정안내.md 1번을 마치면 넣어요
   kakaoAppKey: "",   // (임시) 카카오 JavaScript 키 — 설정안내.md 2번을 마치면 넣어요
   heroImage: "",     // 첫 화면 학교 사진 (예: "images/campus.jpg"). 비어 있으면 바다색 그림
+  introMusic: "",   // 소개 영상 배경음악 파일 (예: "images/music/rock.mp3"). 비어 있으면 코드로 만든 록 음악이 나와요
   mapImage: "",      // 학교 맵 사진 (예: "images/campus-map.jpg"). 비어 있으면 "준비 중" 그림
 
   /* ---------- 날짜별 일정 ----------
@@ -59,6 +60,7 @@ window.FESTIVAL = {
        nameEn : 영어 이름 (포스터에 크게 들어가요, 비워도 됨)
        photo  : 포스터 대표 사진 — 세로 사진 추천 (예: "images/artists/haeyang.jpg")
        photos : 소개 영상에서 빠르게 넘어갈 사진들 (예: ["images/artists/h1.jpg", "images/artists/h2.jpg"])
+       music  : 이 아티스트 소개 영상에만 쓸 음악 파일 (비우면 introMusic 또는 기본 록 음악)
        video  : 진짜 소개 영상 파일이 있으면 (예: "images/artists/haeyang.mp4") → 이 영상이 대신 재생돼요
        ※ 사진·영상은 소속사/본인 허락을 받은 것만! CREDITS.md 에 출처를 적어 주세요.
        ※ 미리 보기: 주소 끝에 ?demo=lineup 을 붙이면 샘플 아티스트로 채워서 보여 줘요.

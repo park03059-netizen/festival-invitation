@@ -5,6 +5,7 @@
 (function () {
   'use strict';
   var A = window.App, C = A.C, el = A.el, $ = A.$;
+  var EPIC = 'images/stage-epic.jpg'; // 아티스트 사진이 없을 때 쓰는 웅장한 무대 그림
   var WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   var TINTS = [
     { dark: '#0f2a4a', light: '#f08a24' }, // 남색 + 단풍 주황
@@ -27,8 +28,8 @@
         list.push({
           day: d, dayNo: di + 1, it: it, shown: shown, headliner: !!it.headliner,
           name: shown ? a.name : '', nameEn: shown ? (a.nameEn || '') : '', desc: shown ? (a.desc || '') : '',
-          photo: shown ? a.photo : '', photos: shown ? [a.photo].concat(a.photos || []).filter(Boolean) : [],
-          video: shown ? a.video : '', revealAt: A.revealAt(it)
+          photo: (shown && a.photo) || EPIC, photos: shown && a.photo ? [a.photo].concat(a.photos || []).filter(Boolean) : [EPIC],
+          video: shown ? a.video : '', music: (shown && a.music) || C.introMusic || '', revealAt: A.revealAt(it)
         });
       });
     });
@@ -95,11 +96,14 @@
       var frame = el('div', { class: 'reel-frame' });
       bar = el('i', { class: 'reel-bar' });
       var closeBtn = el('button', { type: 'button', class: 'reel-close', 'aria-label': '닫기', text: '✕', onclick: close });
+      var muteBtn = x.video ? null : el('button', { type: 'button', class: 'reel-mute', 'aria-label': '소리 켜기/끄기', text: window.RockMusic && RockMusic.isMuted() ? '🔇' : '🔊', onclick: function () {
+        RockMusic.setMuted(!RockMusic.isMuted()); muteBtn.textContent = RockMusic.isMuted() ? '🔇' : '🔊';
+      } });
       endBox = el('div', { class: 'reel-end', hidden: true }, [
         el('button', { type: 'button', class: 'btn', text: '↺ 다시 보기', onclick: function () { endBox.hidden = true; start(); } }),
         el('a', { class: 'btn ghost', href: '#rsvp', text: '✉️ 참석 여부 알려주기', onclick: close })
       ]);
-      frame.append(el('div', { class: 'reel-progress' }, [bar]), closeBtn, endBox);
+      frame.append(el('div', { class: 'reel-progress' }, [bar]), closeBtn, muteBtn, endBox);
 
       if (x.video) {
         vid = el('video', { src: x.video, playsinline: true, 'webkit-playsinline': true, controls: true, autoplay: true, preload: 'auto', poster: x.photo || null });
@@ -119,12 +123,16 @@
       document.body.append(ov);
       document.documentElement.style.overflow = 'hidden';
       document.addEventListener('keydown', onKey);
-      if (!x.video) prepare().then(start);
+      if (!x.video) {
+        if (window.RockMusic && !A.REDUCED) RockMusic.unlock(); // 누른 순간에 소리 허락 받기 (폰 규칙)
+        prepare().then(start);
+      }
     }
     function onKey(e) { if (e.key === 'Escape') close(); if (e.key === ' ' && cv) { e.preventDefault(); togglePause(); } }
     function close() {
       cancelAnimationFrame(raf);
       if (vid) { vid.pause(); vid = null; }
+      if (window.RockMusic) RockMusic.stop();
       if (ov) ov.remove();
       ov = cv = ctx = null;
       document.documentElement.style.overflow = '';
@@ -146,10 +154,12 @@
         for (var i = 0; i < d.data.length; i += 4) { var v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 40; }
         nx.putImageData(d, 0, 0);
       }
-      return Promise.all(loads.concat([fontReady]));
+      var music = window.RockMusic && !A.REDUCED ? RockMusic.prepare(spec.music) : Promise.resolve();
+      return Promise.all(loads.concat([fontReady, music]));
     }
     function start() {
       paused = false; t0 = performance.now();
+      if (window.RockMusic && !A.REDUCED) RockMusic.play(function () { return (performance.now() - t0) / 1000; });
       if (A.REDUCED) { draw(DUR - 1.2); bar.style.width = '100%'; endBox.hidden = false; return; }
       loop();
     }
@@ -162,8 +172,8 @@
     }
     function togglePause() {
       if (!endBox.hidden || A.REDUCED) return;
-      if (paused) { t0 += performance.now() - pausedAt; paused = false; loop(); }
-      else { paused = true; pausedAt = performance.now(); cancelAnimationFrame(raf); }
+      if (paused) { t0 += performance.now() - pausedAt; paused = false; if (window.RockMusic) RockMusic.resume(); loop(); }
+      else { paused = true; pausedAt = performance.now(); cancelAnimationFrame(raf); if (window.RockMusic) RockMusic.pause(); }
     }
 
     /* ----- 그리기 도우미 ----- */
@@ -182,10 +192,10 @@
         var w = im.width * s, h = im.height * s;
         ctx.drawImage(im, (W - w) / 2 + ox, (H - h) / 2 + oy, w, h);
       } else silhouette(zoom, ox, oy);
-      ctx.globalCompositeOperation = 'saturation'; ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, W, H);
-      ctx.globalCompositeOperation = 'color-dodge'; ctx.fillStyle = '#555'; ctx.fillRect(0, 0, W, H); // 밝게
-      ctx.globalCompositeOperation = 'overlay'; ctx.drawImage(cv, 0, 0, W, H); // 대비 높이기
-      ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = tint.light; ctx.fillRect(0, 0, W, H);
+      // 사진 본래의 무대 조명은 살리고, 컷마다 다른 색 조명을 한 겹 덧입혀요
+      ctx.globalAlpha = (alpha == null ? 1 : alpha) * .55;
+      ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = tint.light; ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = (alpha == null ? 1 : alpha) * .25;
       ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = tint.dark; ctx.fillRect(0, 0, W, H);
       ctx.restore();
     }
@@ -237,7 +247,7 @@
 
     // 컷 박자표: 예고(0~3.6초) 뒤 점점 빨라지는 컷
     var CUTS = (function () {
-      var gaps = [.9, .7, .7, .5, .5, .9, .35, .35, .6, .5, .4, .4, .8, .3, .3], t = 3.6, out = [];
+      var gaps = [.8, .8, .4, .4, .8, .4, .4, .8, .4, .4, .8, .4, .4, .4, .4], t = 3.6, out = []; // 음악 박자(0.4초)에 맞춘 컷
       gaps.forEach(function (g) { out.push(t); t += g; });
       out.push(t); return out; // 마지막 값 ≈ 12초
     })();
@@ -312,6 +322,12 @@
     return { open: open, close: close };
   })();
 
+  // 음악은 미리 조용히 만들어 둬요 (재생 버튼을 누를 때 바로 나오게)
+  if (window.RockMusic && !A.REDUCED) {
+    var warm = function () { RockMusic.render().catch(function () {}); };
+    document.addEventListener('tabshown', function (e) { if (e.detail === 'artists') setTimeout(warm, 600); });
+    if (location.hash === '#artists') setTimeout(warm, 1200);
+  }
   document.addEventListener('artistsbuilt', render);
   render();
 })();

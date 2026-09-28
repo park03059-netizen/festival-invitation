@@ -431,11 +431,11 @@ textarea.input { min-height: 96px; resize: vertical; }
 }
 .poster.headliner { flex-basis: 86%; }
 .poster-img { position: absolute; inset: 0; z-index: -1; }
-.poster-img img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.2) brightness(1.4); }
+.poster-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(1.25) contrast(1.1); }
 .poster-sil { position: absolute; inset: 0; background: linear-gradient(180deg, #2a3140, #0b0f16); }
 .poster-sil svg { width: 100%; height: 100%; }
 /* 듀오톤: 흑백 사진 위에 남색(어두운 곳) + 주황(밝은 곳) */
-.poster-img .tone { position: absolute; inset: 0; background: linear-gradient(160deg, #f08a24 0%, #e0463a 45%, #0e7c7b 100%); mix-blend-mode: multiply; }
+.poster-img .tone { position: absolute; inset: 0; background: linear-gradient(160deg, #f08a24 0%, #e0463a 45%, #0e7c7b 100%); mix-blend-mode: soft-light; opacity: .75; }
 .poster-img .tone::after { content: ""; position: absolute; inset: 0; background: #0f2a4a; mix-blend-mode: screen; opacity: .45; }
 .poster.locked .poster-img .tone { background: linear-gradient(160deg, #8a7bff, #0e7c7b); }
 .poster-img .grain {
@@ -487,3 +487,17 @@ video.reel-media { object-fit: contain; }
 .reel-close { position: absolute; top: 2px; right: 4px; z-index: 3; width: 48px; height: 48px; border: 0; background: transparent; color: #fff; font-size: 22px; text-shadow: 0 1px 4px #000; }
 .reel-end { position: absolute; left: 16px; right: 16px; bottom: 110px; z-index: 3; display: grid; gap: 10px; }
 .reel-hint { color: rgba(255,255,255,.7); font-size: 13px; margin: 0; min-height: 1em; }
+
+/* 소리 버튼 */
+.reel-mute { position: absolute; top: 2px; right: 50px; z-index: 3; width: 48px; height: 48px; border: 0; background: transparent; font-size: 20px; }
+
+/* 포스터: 천천히 다가오는 사진 + 지나가는 조명 */
+.poster-img img { animation: posterZoom 14s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+@keyframes posterZoom { from { transform: scale(1.02); } to { transform: scale(1.12); } }
+.poster-img::after {
+  content: ""; position: absolute; inset: -20% -60%;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,236,200,.28) 50%, transparent 60%);
+  mix-blend-mode: screen; animation: sweep 5.5s ease-in-out infinite; pointer-events: none;
+}
+@keyframes sweep { 0%, 55% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+.poster.headliner { box-shadow: 0 0 0 2px rgba(246,193,75,.8), 0 14px 36px rgba(240,138,36,.35); }
