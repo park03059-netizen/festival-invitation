@@ -61,6 +61,7 @@ window.FESTIVAL = {
        photo  : 포스터 대표 사진 — 세로 사진 추천 (예: "images/artists/haeyang.jpg")
        photos : 소개 영상에서 빠르게 넘어갈 사진들 (예: ["images/artists/h1.jpg", "images/artists/h2.jpg"])
        music  : 이 아티스트 소개 영상에만 쓸 음악 파일 (비우면 introMusic 또는 기본 록 음악)
+       youtube: 유튜브 영상 번호 (주소 끝 11글자). 예고 연출 뒤 유튜브 공식 플레이어로 재생돼요
        video  : 진짜 소개 영상 파일이 있으면 (예: "images/artists/haeyang.mp4") → 이 영상이 대신 재생돼요
        ※ 사진·영상은 소속사/본인 허락을 받은 것만! CREDITS.md 에 출처를 적어 주세요.
        ※ 미리 보기: 주소 끝에 ?demo=lineup 을 붙이면 샘플 아티스트로 채워서 보여 줘요.
@@ -105,7 +106,10 @@ window.FESTIVAL = {
         { start: "14:00", end: "14:40", type: "club", title: "동아리 공연 ③", desc: "보컬 동아리 (임시)" },
         { start: "18:30", end: "19:10", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
         { start: "19:30", end: "20:20", type: "artist", title: "아티스트 공연", artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
-        { start: "20:40", end: "21:30", type: "artist", title: "헤드라이너 공연", headliner: true, artist: { name: "", nameEn: "", photo: "", photos: [], video: "", desc: "" } },
+        { start: "20:40", end: "21:30", type: "artist", title: "헤드라이너 공연", headliner: true,
+          // (임시) 섭외 확정 전 — 공개일(artistRevealDate) 전에는 "추후 공개"로 보여요
+          artist: { name: "한로로", nameEn: "HANRORO", photo: "", photos: [], video: "", desc: "헤드라이너 (임시)",
+                    youtube: "IOc1CzRaNho" } },  // 유튜브 영상 주소의 끝 부분 (youtube.com/shorts/여기)
         { start: "21:30", end: "21:45", type: "fireworks", title: "폐막 불꽃놀이", desc: "(임시)" }
       ]
     }

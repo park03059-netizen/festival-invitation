@@ -29,7 +29,7 @@
           day: d, dayNo: di + 1, it: it, shown: shown, headliner: !!it.headliner,
           name: shown ? a.name : '', nameEn: shown ? (a.nameEn || '') : '', desc: shown ? (a.desc || '') : '',
           photo: (shown && a.photo) || EPIC, photos: shown && a.photo ? [a.photo].concat(a.photos || []).filter(Boolean) : [EPIC],
-          video: shown ? a.video : '', music: (shown && a.music) || C.introMusic || '', revealAt: A.revealAt(it)
+          video: shown ? a.video : '', youtube: shown ? (a.youtube || '') : '', music: (shown && a.music) || C.introMusic || '', revealAt: A.revealAt(it)
         });
       });
     });
@@ -87,7 +87,7 @@
   /* ---------- 소개 영상 플레이어 ---------- */
   var Player = (function () {
     var ov, cv, ctx, bar, raf, t0 = 0, paused = false, pausedAt = 0, spec, imgs = [], vid = null, endBox, W = 360, H = 640, DUR = 17;
-    var noise;
+    var noise, yt = null, muteRef = null;
 
     function open(x) {
       spec = x;
@@ -103,6 +103,7 @@
         el('button', { type: 'button', class: 'btn', text: '↺ 다시 보기', onclick: function () { endBox.hidden = true; start(); } }),
         el('a', { class: 'btn ghost', href: '#rsvp', text: '✉️ 참석 여부 알려주기', onclick: close })
       ]);
+      muteRef = muteBtn;
       frame.append(el('div', { class: 'reel-progress' }, [bar]), closeBtn, muteBtn, endBox);
 
       if (x.video) {
@@ -132,6 +133,7 @@
     function close() {
       cancelAnimationFrame(raf);
       if (vid) { vid.pause(); vid = null; }
+      window.removeEventListener('message', onYT); yt = null;
       if (window.RockMusic) RockMusic.stop();
       if (ov) ov.remove();
       ov = cv = ctx = null;
@@ -158,7 +160,9 @@
       return Promise.all(loads.concat([fontReady, music]));
     }
     function start() {
+      if (yt) { yt.remove(); yt = null; cv.hidden = false; if (muteRef) muteRef.hidden = false; }
       paused = false; t0 = performance.now();
+      if (A.REDUCED && spec.youtube) { toYouTube(); return; }
       if (window.RockMusic && !A.REDUCED) RockMusic.play(function () { return (performance.now() - t0) / 1000; });
       if (A.REDUCED) { draw(DUR - 1.2); bar.style.width = '100%'; endBox.hidden = false; return; }
       loop();
@@ -166,6 +170,7 @@
     function loop() {
       if (!ctx) return;
       var t = (performance.now() - t0) / 1000;
+      if (spec.youtube && t >= 3.6) { toYouTube(); return; } // 예고 연출이 끝나면 유튜브 영상으로 넘어가요
       if (t >= DUR) { draw(DUR - 0.01); bar.style.width = '100%'; endBox.hidden = false; return; }
       draw(t); bar.style.width = (t / DUR * 100) + '%';
       raf = requestAnimationFrame(loop);
@@ -174,6 +179,36 @@
       if (!endBox.hidden || A.REDUCED) return;
       if (paused) { t0 += performance.now() - pausedAt; paused = false; if (window.RockMusic) RockMusic.resume(); loop(); }
       else { paused = true; pausedAt = performance.now(); cancelAnimationFrame(raf); if (window.RockMusic) RockMusic.pause(); }
+    }
+
+    /* ----- 유튜브 영상으로 넘어가기 (영상 파일을 내려받지 않고 유튜브 공식 플레이어로 재생) ----- */
+    function toYouTube() {
+      cancelAnimationFrame(raf);
+      if (window.RockMusic) RockMusic.stop();
+      if (muteRef) muteRef.hidden = true;
+      cv.hidden = true;
+      yt = el('iframe', {
+        class: 'reel-media reel-yt', title: (spec.name || '아티스트') + ' 소개 영상 (YouTube)',
+        src: 'https://www.youtube.com/embed/' + encodeURIComponent(spec.youtube) +
+          '?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&origin=' + encodeURIComponent(location.origin),
+        allow: 'autoplay; encrypted-media; picture-in-picture', allowfullscreen: true, frameborder: '0'
+      });
+      yt.addEventListener('load', function () {
+        try { yt.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); } catch (e) {}
+      });
+      cv.after(yt);
+      bar.style.width = '0%';
+      window.addEventListener('message', onYT);
+      var hint = ov && ov.querySelector('.reel-hint');
+      if (hint) hint.textContent = '소리가 안 나거나 멈춰 있으면 영상을 한 번 눌러 주세요';
+    }
+    function onYT(e) { // 유튜브 플레이어가 알려 주는 재생 위치·끝남 신호
+      if (!yt || !/youtube\.com$/.test(new URL(e.origin).hostname)) return;
+      var d; try { d = JSON.parse(e.data); } catch (_) { return; }
+      var info = d && d.info;
+      if (!info) return;
+      if (info.currentTime != null && info.duration) bar.style.width = (info.currentTime / info.duration * 100) + '%';
+      if (info.playerState === 0) { bar.style.width = '100%'; endBox.hidden = false; }
     }
 
     /* ----- 그리기 도우미 ----- */
